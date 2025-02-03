@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import { RefObject } from "react"; // Aggiungi React
 import { PokemonCard } from "../types";
 import { TypeIcon } from "./TypeIcon";
 
