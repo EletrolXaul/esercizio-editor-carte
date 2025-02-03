@@ -94,6 +94,40 @@ export function CardEditor({ card, onCardChange }: CardEditorProps) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              Immagine URL (opzionale)
+            </label>
+            <div className="mt-1 flex gap-2">
+              <input
+                type="text"
+                name="imageUrl"
+                value={card.imageUrl.startsWith('data:') ? '' : card.imageUrl}
+                onChange={(e) => onCardChange({ ...card, imageUrl: e.target.value })}
+                placeholder="Inserisci URL immagine"
+                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <label className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg cursor-pointer">
+                Upload
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        onCardChange({ ...card, imageUrl: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }} 
+                  className="hidden" 
+                />
+              </label>
+            </div>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Descrizione</label>
             <textarea
               name="description"

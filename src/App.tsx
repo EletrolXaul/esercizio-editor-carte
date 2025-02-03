@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { Download, Upload, Moon, Sun } from 'lucide-react';
 import { CardEditor } from './components/CardEditor';
@@ -12,8 +12,9 @@ function App() {
     name: 'Pikachu',
     hp: 60,
     type: 'Lightning',
-    imageUrl: '/assets/cards/default-card.png', // Usa un'immagine dalla tua cartella assets
-    cardBackground: '/assets/cards/lightning-card.webp', // Aggiungi il background iniziale
+    // Usa un'immagine di default che cambia in base al tema
+    imageUrl: isDark ? '/assets/cards/default-dark.png' : '/assets/cards/default-light.png',
+    cardBackground: '/assets/cards/lightning-card.webp',
     description: 'Mouse Pokémon. Length: 1\'04", Weight: 13 lbs.',
     attack1: 'Thunder Shock',
     attack1Damage: '20',
@@ -26,6 +27,38 @@ function App() {
     retreatCost: 1
   });
 
+  // Aggiorna l'immagine di default quando cambia il tema
+  useEffect(() => {
+    if (card.imageUrl.includes('default-')) {
+      setCard(prev => ({
+        ...prev,
+        imageUrl: isDark ? '/assets/cards/default-dark.png' : '/assets/cards/default-light.png'
+      }));
+    }
+  }, [isDark, card.imageUrl]);
+
+  const handleImageChange = (url: string) => {
+    // Valida se l'URL è valido
+    try {
+      new URL(url);
+      setCard(prev => ({ ...prev, imageUrl: url }));
+    } catch {
+      // Se non è un URL valido, usa il percorso locale
+      setCard(prev => ({ ...prev, imageUrl: url }));
+    }
+  };
+
+  const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleImageChange(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const exportCard = async () => {
     if (cardRef.current) {
       const dataUrl = await toPng(cardRef.current, { quality: 0.95 });
@@ -33,17 +66,6 @@ function App() {
       link.download = `pokemon-card-${card.name}.png`;
       link.href = dataUrl;
       link.click();
-    }
-  };
-
-  const importImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCard(prev => ({ ...prev, imageUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -67,7 +89,7 @@ function App() {
         <label className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg cursor-pointer">
           <Upload size={20} />
           Import
-          <input type="file" accept="image/*" onChange={importImage} className="hidden" />
+          <input type="file" accept="image/*" onChange={handleImageInput} className="hidden" />
         </label>
       </div>
 
