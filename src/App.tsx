@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { toPng } from 'html-to-image';
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Moon, Sun } from 'lucide-react';
 
 interface PokemonCard {
   name: string;
@@ -114,6 +114,8 @@ function App() {
     retreatCost: 1
   });
 
+  const [isDark, setIsDark] = useState(false);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCard(prev => ({ ...prev, [name]: value }));
@@ -150,224 +152,229 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-yellow-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Editor Form */}
-        <div className="bg-white p-8 rounded-xl shadow-lg">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800">Pokémon Card Editor</h2>
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+    <div className={`min-h-screen ${isDark ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-yellow-50'}`}>
+      {/* Header con i pulsanti */}
+      <div className="fixed top-0 right-0 p-4 flex gap-4 z-10">
+        <button
+          onClick={() => setIsDark(!isDark)}
+          className="p-2 rounded-lg bg-white/90 dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all"
+        >
+          {isDark ? <Sun className="text-yellow-500" /> : <Moon className="text-gray-700" />}
+        </button>
+        <button
+          onClick={exportCard}
+          className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow-lg"
+        >
+          <Download size={20} />
+          Export
+        </button>
+        <label className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg cursor-pointer">
+          <Upload size={20} />
+          Import
+          <input type="file" accept="image/*" onChange={importImage} className="hidden" />
+        </label>
+      </div>
+
+      {/* Main content */}
+      <div className="pt-20 flex min-h-screen">
+        {/* Editor Form - Scrollabile */}
+        <div className="w-1/2 p-8 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">Pokémon Card Editor</h2>
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={card.name}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">HP</label>
+                  <input
+                    type="number"
+                    name="hp"
+                    value={card.hp}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                <select
+                  name="type"
+                  value={card.type}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                >
+                  {TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
                 <input
                   type="text"
-                  name="name"
-                  value={card.name}
+                  name="imageUrl"
+                  value={card.imageUrl}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700">HP</label>
-                <input
-                  type="number"
-                  name="hp"
-                  value={card.hp}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <textarea
+                  name="description"
+                  value={card.description}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
+                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                  rows={2}
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Type</label>
-              <select
-                name="type"
-                value={card.type}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-              >
-                {TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Image URL</label>
-              <input
-                type="text"
-                name="imageUrl"
-                value={card.imageUrl}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                name="description"
-                value={card.description}
-                onChange={handleInputChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                rows={2}
-              />
-            </div>
-
-            {/* Attack 1 */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-700">Attack 1</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <input
-                    type="text"
-                    name="attack1"
-                    value={card.attack1}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                  />
+              {/* Attack 1 */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">Attack 1</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                    <input
+                      type="text"
+                      name="attack1"
+                      value={card.attack1}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Damage</label>
+                    <input
+                      type="text"
+                      name="attack1Damage"
+                      value={card.attack1Damage}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Damage</label>
-                  <input
-                    type="text"
-                    name="attack1Damage"
-                    value={card.attack1Damage}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Energy Cost</label>
+                  <div className="flex gap-2 mt-1">
+                    {[0].map((_, index) => (
+                      <select
+                        key={index}
+                        value={card.attack1Cost[index]}
+                        onChange={(e) => handleEnergyCostChange(1, index, e.target.value)}
+                        className="block w-32 rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                      >
+                        {TYPES.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Energy Cost</label>
-                <div className="flex gap-2 mt-1">
-                  {[0].map((_, index) => (
-                    <select
-                      key={index}
-                      value={card.attack1Cost[index]}
-                      onChange={(e) => handleEnergyCostChange(1, index, e.target.value)}
-                      className="block w-32 rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                    >
-                      {TYPES.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Attack 2 */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-700">Attack 2</h3>
-              <div className="grid grid-cols-2 gap-4">
+              {/* Attack 2 */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">Attack 2</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                    <input
+                      type="text"
+                      name="attack2"
+                      value={card.attack2}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Damage</label>
+                    <input
+                      type="text"
+                      name="attack2Damage"
+                      value={card.attack2Damage}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                    />
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <input
-                    type="text"
-                    name="attack2"
-                    value={card.attack2}
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Energy Cost</label>
+                  <div className="flex gap-2 mt-1">
+                    {[0, 1].map((_, index) => (
+                      <select
+                        key={index}
+                        value={card.attack2Cost[index]}
+                        onChange={(e) => handleEnergyCostChange(2, index, e.target.value)}
+                        className="block w-32 rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                      >
+                        {TYPES.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Weakness</label>
+                  <select
+                    name="weakness"
+                    value={card.weakness}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                  />
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                  >
+                    {TYPES.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Damage</label>
-                  <input
-                    type="text"
-                    name="attack2Damage"
-                    value={card.attack2Damage}
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Resistance</label>
+                  <select
+                    name="resistance"
+                    value={card.resistance}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
+                  >
+                    {TYPES.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Retreat Cost</label>
+                  <input
+                    type="number"
+                    name="retreatCost"
+                    value={card.retreatCost}
+                    onChange={handleInputChange}
+                    min="0"
+                    max="4"
+                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-yellow-500 dark:focus:ring-yellow-200"
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Energy Cost</label>
-                <div className="flex gap-2 mt-1">
-                  {[0, 1].map((_, index) => (
-                    <select
-                      key={index}
-                      value={card.attack2Cost[index]}
-                      onChange={(e) => handleEnergyCostChange(2, index, e.target.value)}
-                      className="block w-32 rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                    >
-                      {TYPES.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Weakness</label>
-                <select
-                  name="weakness"
-                  value={card.weakness}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                >
-                  {TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Resistance</label>
-                <select
-                  name="resistance"
-                  value={card.resistance}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                >
-                  {TYPES.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Retreat Cost</label>
-                <input
-                  type="number"
-                  name="retreatCost"
-                  value={card.retreatCost}
-                  onChange={handleInputChange}
-                  min="0"
-                  max="4"
-                  className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={exportCard}
-                className="flex items-center gap-2 px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors shadow-md"
-              >
-                <Download size={20} />
-                Export Card
-              </button>
-              <label className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md cursor-pointer">
-                <Upload size={20} />
-                Import Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={importImage}
-                  className="hidden"
-                />
-              </label>
             </div>
           </div>
         </div>
 
-        {/* Card Preview */}
-        <div className="flex items-start justify-center p-4">
+        {/* Card Preview - Fissa */}
+        <div className="w-1/2 fixed right-0 top-20 bottom-0 flex items-center justify-center p-4">
           <div
             ref={cardRef}
             className="w-[400px] h-[560px] rounded-xl p-4 relative overflow-hidden"
