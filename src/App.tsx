@@ -120,7 +120,7 @@ function App() {
       'attack2', 'attack2Damage', 'attack2Cost',
       'weakness', 'resistance', 'retreatCost'
     ];
-    return requiredFields.every(field => field in data);
+    return typeof data === 'object' && data !== null && requiredFields.every(field => field in data);
   };
 
   return (
