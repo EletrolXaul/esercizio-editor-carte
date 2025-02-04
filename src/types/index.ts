@@ -20,4 +20,5 @@ export interface PokemonCard {
 export interface TypeIconProps {
   type: string;
   size?: 'small' | 'large';
+  className?: string;
 }

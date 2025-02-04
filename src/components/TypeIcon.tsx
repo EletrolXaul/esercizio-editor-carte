@@ -1,16 +1,19 @@
-import { TypeIconProps } from '../types';
-import { TYPE_IMAGES } from '../constants/types';
+import { TypeIconProps } from "../types";
+import { TYPE_IMAGES } from "../constants/types";
 
-export function TypeIcon({ type, size = 'small' }: TypeIconProps) {
+export function TypeIcon({ type, size, className }: TypeIconProps) {
   const baseClasses = `rounded-full flex items-center justify-center overflow-hidden`;
-  const sizeClasses = size === 'small' ? 'w-6 h-6' : 'w-8 h-8';
-  
+  const sizeClasses = size === "small" ? "w-6 h-6" : "";
+  const sizeClassesBig = size === "large" ? "w-12 h-12" : "";
+
   return (
-    <div className={`${baseClasses} ${sizeClasses}`}>
-      <img 
+    <div
+      className={`${baseClasses} ${sizeClasses} ${sizeClassesBig} ${className}`}
+    >
+      <img
         src={TYPE_IMAGES[type]}
         alt={type}
-        className="w-6 h-6 object-contain"
+        className="w-full h-full object-contain"
       />
     </div>
   );

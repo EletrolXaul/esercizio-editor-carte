@@ -23,7 +23,7 @@ function App() {
     attack2Damage: '10',
     attack2Cost: ['Colorless', 'Lightning'],
     weakness: 'Fighting',
-    resistance: 'Metal',
+    resistance: 'Fire',
     retreatCost: 1
   });
 

@@ -88,17 +88,17 @@ export function CardPreview({ card, cardRef }: CardPreviewProps) {
           </div>
 
           {/* Footer */}
-          <div className="absolute bottom-4 left-4 right-4 z-20">
+          <div className="absolute bottom-[3.4rem] left-4 right-4 z-20">
             <div className="flex justify-between items-center p-2 ">
-              <div className="flex items-center gap-2">
-                <TypeIcon type={card.weakness} size="small" />
+              <div className="flex items-center justify-center pl-2 gap-2 w-[90px]">
+                <TypeIcon type={card.weakness} className="size-4" />
               </div>
-              <div className="flex items-center gap-2">
-                <TypeIcon type={card.resistance} size="small" />
+              <div className="flex items-center justify-center pl-2 gap-2 w-[90px]">
+                <TypeIcon type={card.resistance} className="size-4" />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center pl-2 gap-1 w-[90px]">
                 {Array.from({ length: card.retreatCost }).map((_, i) => (
-                  <TypeIcon key={i} type="Colorless" size="small" />
+                  <TypeIcon key={i} type="Colorless" className="size-4" />
                 ))}
               </div>
             </div>
